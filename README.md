@@ -1,5 +1,7 @@
 # sando.host
 
+VIBE CODING!!!
+
 A minimal, zero-backend network console that runs entirely in the browser. Real Mbps speed test, geo-cross-check across 7 providers, WebRTC leak detection, DNS-over-HTTPS, pseudo-ping, http inspection — all from three static files.
 
 **Live demo:** https://sando-host-ztamhtxp.devinapps.com
