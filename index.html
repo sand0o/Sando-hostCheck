@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="sando.host — minimal console for network host diagnostics." />
+  <title>sando.host — network console</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">sando<span class="brand-dim">.host</span></div>
+    <div class="topbar-right">
+      <div class="lang-switch" role="group" aria-label="language">
+        <button class="lang" type="button" data-lang="en" aria-selected="true">en</button>
+        <span class="lang-sep">·</span>
+        <button class="lang" type="button" data-lang="ru">ru</button>
+      </div>
+      <div class="ip-line">
+        <span class="ip-tag" data-i18n="yourIp">your ip</span>
+        <span class="ip-sep">—</span>
+        <span class="ip-value" id="ipValue">…</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="page">
+    <section class="lede">
+      <p class="lede-text">
+        <span data-i18n="ledeMain">a single console for diagnostics — geolocation, dns, http, latency.</span>
+        <span class="lede-fade" data-i18n="ledeFade">no clutter, no images, just signal.</span>
+      </p>
+    </section>
+
+    <nav class="modes" role="tablist" aria-label="Inspection mode">
+      <button class="mode" data-action="speed" role="tab" aria-selected="true">
+        <span class="mode-num">01</span><span class="mode-name" data-i18n="modeSpeed">speed</span>
+      </button>
+      <button class="mode" data-action="info" role="tab">
+        <span class="mode-num">02</span><span class="mode-name" data-i18n="modeInfo">ip info</span>
+      </button>
+      <button class="mode" data-action="dns" role="tab">
+        <span class="mode-num">03</span><span class="mode-name" data-i18n="modeDns">dns</span>
+      </button>
+      <button class="mode" data-action="http" role="tab">
+        <span class="mode-num">04</span><span class="mode-name" data-i18n="modeHttp">http</span>
+      </button>
+      <button class="mode" data-action="ping" role="tab">
+        <span class="mode-num">05</span><span class="mode-name" data-i18n="modePing">ping</span>
+      </button>
+      <button class="mode" data-action="anon" role="tab">
+        <span class="mode-num">06</span><span class="mode-name" data-i18n="modeAnon">anonymity</span>
+      </button>
+      <button class="mode" data-action="region" role="tab">
+        <span class="mode-num">07</span><span class="mode-name" data-i18n="modeRegion">region</span>
+      </button>
+    </nav>
+
+    <section class="entry">
+      <div class="input-line">
+        <span class="prompt">›</span>
+        <input
+          id="hostInput"
+          class="host-input"
+          type="text"
+          placeholder="hostname or ip address"
+          autocomplete="off"
+          spellcheck="false"
+        />
+        <button class="run-btn" id="runBtn" type="button">
+          <span data-i18n="run">run</span><span class="run-arrow">→</span>
+        </button>
+      </div>
+
+      <p class="hint" id="hostHint">enter a hostname or ip — or leave empty for modes that don't need a target.</p>
+
+      <div class="provider-row" id="providerRow" hidden>
+        <span class="provider-tag" data-i18n="via">via</span>
+        <button class="provider" type="button" data-provider="mlab" aria-selected="true">m-lab</button>
+        <span class="provider-sep">·</span>
+        <button class="provider" type="button" data-provider="cloudflare">cloudflare</button>
+        <span class="provider-sep">·</span>
+        <a class="provider provider-ext" href="https://yandex.ru/internet/" target="_blank" rel="noopener noreferrer">yandex.ru/internet&nbsp;↗</a>
+        <span class="provider-sep">·</span>
+        <a class="provider provider-ext" href="https://www.speedtest.net/" target="_blank" rel="noopener noreferrer">speedtest.net&nbsp;↗</a>
+      </div>
+
+      <div class="history-row" id="historyRow" hidden>
+        <span class="history-tag" data-i18n="recent">recent</span>
+        <div class="history-chips" id="historyChips"></div>
+        <button class="history-clear" id="historyClear" type="button" data-i18n="clear">clear</button>
+      </div>
+    </section>
+
+    <section class="window" id="resultSection" aria-live="polite">
+      <div class="window-bar">
+        <span class="dots">
+          <span class="dot dot-r"></span>
+          <span class="dot dot-y"></span>
+          <span class="dot dot-g"></span>
+        </span>
+        <span class="window-title" id="resultTitle">stdout</span>
+        <button class="copy-btn" id="copyBtn" type="button" aria-label="copy results" title="copy results">
+          <svg viewBox="0 0 16 16" width="13" height="13" aria-hidden="true">
+            <rect x="4.5" y="4.5" width="8" height="9" rx="1.2" fill="none" stroke="currentColor" stroke-width="1.2"/>
+            <path d="M2.5 11.5V3a.5.5 0 0 1 .5-.5h7" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
+          </svg>
+          <span class="copy-label" data-i18n="copy">copy</span>
+        </button>
+        <span class="window-status" id="resultStatus" data-i18n="statusIdle">idle</span>
+      </div>
+      <div class="window-body" id="resultBody">
+        <div class="placeholder">
+          <span class="caret">▍</span>&nbsp;<span data-i18n="placeholder">waiting for input — pick a mode and type a host above.</span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <span>© <span id="year"></span> sando.host</span>
+    <span class="footer-mid" data-i18n="madeBy">made by sando</span>
+    <span class="footer-right">v1.2 · static</span>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
